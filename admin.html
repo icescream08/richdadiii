@@ -156,7 +156,7 @@
 
 <script type="module">
 import { SUPABASE_URL, SUPABASE_KEY, ADMIN_EMAIL, loadCreateClient } from './engines/supabase-config.js';
-import { filterRows, toExportRows, exportFilename, formatManila } from './engines/admin-data.js';
+import { filterRows, toExportRows, exportFilename, formatManila, loginMessage } from './engines/admin-data.js';
 
 const $ = (id) => document.getElementById(id);
 const views = ['v-login', 'v-denied', 'v-app'];
@@ -270,9 +270,9 @@ $('f-login').addEventListener('submit', async (e) => {
     email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname },
   });
   $('b-send').disabled = false;
-  if (error) { msg.className = 'msg err'; msg.textContent = 'Could not send the link: ' + error.message; return; }
-  msg.className = 'msg ok';
-  msg.textContent = `If ${email} is the admin email, a sign-in link is on its way. Open it on this device.`;
+  const result = loginMessage(email, error);
+  msg.className = result.ok ? 'msg ok' : 'msg err';
+  msg.textContent = result.text;
 });
 
 document.querySelectorAll('[data-signout]').forEach((b) => b.addEventListener('click', () => db.auth.signOut()));

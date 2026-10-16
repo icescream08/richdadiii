@@ -59,3 +59,18 @@ test('exportFilename uses the Manila date', () => {
   assert.equal(exportFilename(new Date('2026-10-16T03:00:00Z')), 'RichDNA-submissions-2026-10-16.xlsx');
   assert.equal(exportFilename(new Date('2026-10-16T17:00:00Z')), 'RichDNA-submissions-2026-10-17.xlsx');
 });
+
+test('loginMessage hides whether an email is the admin account', async () => {
+  const { loginMessage } = await import('../engines/admin-data.js');
+  const ok = loginMessage('a@b.co', null);
+  assert.deepEqual(loginMessage('a@b.co', { message: 'Signups not allowed for otp' }), ok);
+  assert.equal(ok.ok, true);
+  assert.match(ok.text, /a@b\.co/);
+});
+
+test('loginMessage reports real failures such as rate limits', async () => {
+  const { loginMessage } = await import('../engines/admin-data.js');
+  const r = loginMessage('a@b.co', { message: 'email rate limit exceeded' });
+  assert.equal(r.ok, false);
+  assert.match(r.text, /rate limit/);
+});

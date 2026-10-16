@@ -51,6 +51,15 @@ export function toExportRows(rows) {
   });
 }
 
+// Same answer whether or not the email is the admin, so the form can't be
+// used to discover the admin address.
+export function loginMessage(email, error) {
+  if (error && !/signups not allowed/i.test(error.message || '')) {
+    return { ok: false, text: 'Could not send the link: ' + error.message };
+  }
+  return { ok: true, text: `If ${email} is the admin email, a sign-in link is on its way. Open it on this device.` };
+}
+
 export function exportFilename(date) {
   const p = manilaParts(date);
   return `RichDNA-submissions-${p.year}-${p.month}-${p.day}.xlsx`;
