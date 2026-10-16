@@ -1,0 +1,10 @@
+# Keep internal files in git but off the public site.
+docs/
+supabase/
+tests/
+uploads/
+.claude/
+.superpowers/
+Rich Dadiii Website.html
+PRODUCTION_REVIEW.md
+DESIGN_AUDIT.md

@@ -34,6 +34,8 @@
       html, body { background: #FFFFFF !important; }
     }
     input, select, textarea { min-width: 0; }
+    /* Two-column form rows: let columns shrink so fields stay inside the card */
+    [data-rd-grid2] > * { min-width: 0; }
     /* Mobile layout (media queries cannot be inline) */
     @media (max-width: 600px) {
       [data-rd-grid2] { grid-template-columns: 1fr !important; }
