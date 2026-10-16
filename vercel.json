@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/RichDNA", "destination": "/RichDNA.dc.html" },
+    { "source": "/richdna", "destination": "/RichDNA.dc.html" }
+  ]
+}
