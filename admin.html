@@ -237,9 +237,9 @@ function render() {
 }
 
 function bars(title, scores) {
-  const sorted = [...(scores || [])].sort((a, b) => b.pct - a.pct);
+  const sorted = (Array.isArray(scores) ? scores : []).filter((s) => s && typeof s === 'object').sort((a, b) => b.pct - a.pct);
   return [el('h3', { textContent: title }), ...sorted.map((s, i) => el('div', { className: 'bar' + (i === 0 ? ' top' : '') }, [
-    el('div', { className: 'l' }, [el('span', { textContent: s.name }), el('span', { textContent: s.pct + '%' })]),
+    el('div', { className: 'l' }, [el('span', { textContent: String(s.name) }), el('span', { textContent: (Number(s.pct) || 0) + '%' })]),
     el('div', { className: 't' }, [el('div', { className: 'f', style: `width:${Number(s.pct) || 0}%` })]),
   ]))];
 }

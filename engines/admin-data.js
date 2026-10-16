@@ -25,7 +25,7 @@ export function filterRows(rows, query) {
 }
 
 const pctOf = (scores, name) => {
-  const hit = (scores || []).find((s) => s.name === name);
+  const hit = Array.isArray(scores) ? scores.find((s) => s && s.name === name) : null;
   return hit ? hit.pct : '';
 };
 

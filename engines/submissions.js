@@ -11,7 +11,13 @@ const givingLabel = (name) => (name === 'Receiving Gifts' ? 'Sending Gifts' : na
 const scoresOf = (res, label) => res.results.map((r) => ({ name: label(r.name), pct: r.pct }));
 
 export function newSubmissionId() {
-  return crypto.randomUUID();
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  // Older Safari (< 15.4) has getRandomValues but not randomUUID.
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
 export function buildSubmission({ id, user, identity, love, answersR, answersG }) {
@@ -45,6 +51,20 @@ async function getVisitorClient() {
     });
   }
   return visitorClient;
+}
+
+// Starts saving one completed assessment and returns its new row id, or
+// undefined if it couldn't even start. Never throws — the visitor must
+// always reach their results.
+export function saveCompletion({ user, identity, love, answersR, answersG }, client) {
+  try {
+    const id = newSubmissionId();
+    saveSubmission(buildSubmission({ id, user, identity, love, answersR, answersG }), client);
+    return id;
+  } catch (e) {
+    console.warn('RichDNA: could not prepare submission', e && e.message ? e.message : e);
+    return undefined;
+  }
 }
 
 // Never throws; resolves true when the row was stored.

@@ -661,9 +661,10 @@ class Component extends DCLogic {
   saveOnce() {
     const { identity, love, user, answersR, answersG, submissionId } = this.state;
     if (!this.SUB || submissionId || !identity || !love) return undefined;
-    const id = this.SUB.newSubmissionId();
-    this.SUB.saveSubmission(this.SUB.buildSubmission({ id, user, identity, love, answersR, answersG }));
-    return { submissionId: id };
+    try {
+      const id = this.SUB.saveCompletion({ user, identity, love, answersR, answersG });
+      return id ? { submissionId: id } : undefined;
+    } catch (e) { return undefined; }
   }
 
   async ensureInsight() {

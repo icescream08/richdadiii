@@ -83,3 +83,30 @@ test('saveSubmission inserts the row into richdna_submissions and resolves true'
 test('newSubmissionId returns a v4 uuid', () => {
   assert.match(newSubmissionId(), /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
 });
+
+test('saveCompletion returns the new id and starts the save', async () => {
+  const { saveCompletion } = await import('../engines/submissions.js');
+  const calls = [];
+  const ok = { from: () => ({ insert: async (r) => { calls.push(r); return { error: null }; } }) };
+  const id = saveCompletion({ user, identity: computeIdentity(user.birthdate), love, answersR, answersG }, ok);
+  assert.match(id, /^[0-9a-f-]{36}$/);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].id, id);
+});
+
+test('saveCompletion never throws on bad input and returns undefined', async () => {
+  const { saveCompletion } = await import('../engines/submissions.js');
+  const warn = console.warn; console.warn = () => {};
+  try {
+    assert.equal(saveCompletion({ user, identity: null, love, answersR, answersG }), undefined);
+  } finally { console.warn = warn; }
+});
+
+test('newSubmissionId works without crypto.randomUUID (older Safari)', () => {
+  const orig = crypto.randomUUID;
+  Object.defineProperty(crypto, 'randomUUID', { value: undefined, configurable: true });
+  try {
+    assert.match(newSubmissionId(), /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  } finally { Object.defineProperty(crypto, 'randomUUID', { value: orig, configurable: true }); }
+});

@@ -74,3 +74,11 @@ test('loginMessage reports real failures such as rate limits', async () => {
   assert.equal(r.ok, false);
   assert.match(r.text, /rate limit/);
 });
+
+test('toExportRows tolerates malformed score data instead of breaking the export', () => {
+  const bad = { ...ana, id: 'b', receiving_scores: {}, giving_scores: 'junk' };
+  const rows = toExportRows([bad, ana]);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0]['Receiving – Quality Time %'], '');
+  assert.equal(rows[1]['Receiving – Quality Time %'], 60);
+});
